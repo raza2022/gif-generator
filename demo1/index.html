@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Gif Generator</title>
+    <style>
+        #app {
+            display: flex;
+            max-width: 100px;
+        }
+        .arrow-1 {
+            width:100px;
+            height:30px;
+            top: 0;
+            left: 0;
+            position: relative;
+            transform: rotateZ(180deg) scale(0.4);
+            display: flex;
+        }
+        .arrow-1:before {
+            content: "";
+            background: black;
+            clip-path: polygon(0 10px,calc(100% - 15px) 10px,calc(100% - 15px) 0,100% 50%,calc(100% - 15px) 100%,calc(100% - 15px) calc(100% - 10px),0 calc(100% - 10px));
+            animation: a1 1s infinite linear;
+        }
+        @keyframes a1 {
+            90%,100%{flex-grow: 1}
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <div id="arrow1" class="arrow-1"></div>
+</div>
+
+<button style="margin-top: 14px;" id="generateGifByRecord">Generate GIF(record 2s)</button>
+<script src="https://unpkg.com/modern-gif"></script>
+<script src="https://unpkg.com/mp4box"></script>
+<script src="https://unpkg.com/dom-vcr"></script>
+<script type="module" async>
+    const dom = document.querySelector('#app')
+
+    const gifVcr = await window.domVcr.createVcr(dom, {
+        debug: true,
+        type: 'gif',
+        gif: window.modernGif,
+        interval: 100,
+    })
+
+    document.querySelector('#generateGifByRecord').addEventListener('click', async e => {
+        const button = e.target
+        if (button.innerText === 'Generating') return
+        button.disabled = 'disabled'
+        button.innerText = 'Generating'
+        //increase or decrease the record time as per keyframe
+        await gifVcr.record(2000)
+        const blob = await gifVcr.render()
+        window.open(URL.createObjectURL(blob))
+        button.disabled = undefined
+        button.innerText = 'Generate GIF'
+    })
+</script>
+</body>
+</html>
